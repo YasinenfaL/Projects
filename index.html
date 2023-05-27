@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reservation Form</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="form-container">
+    <h1>Hotel Reservation Form</h1>
+    <form id="reservation-form">
+        <label for="no-of-adults">Number of Adults:</label>
+        <input type="number" id="no-of-adults" name="no_of_adults" required>
+
+        <label for="no-of-children">Number of Children:</label>
+        <input type="number" id="no-of-children" name="no_of_children" required>
+
+        <label for="no-of-weekend-nights">Number of Weekend Nights:</label>
+        <input type="number" id="no-of-weekend-nights" name="no_of_weekend_nights" required>
+
+        <label for="no-of-week-nights">Number of Week Nights:</label>
+        <input type="number" id="no-of-week-nights" name="no_of_week_nights" required>
+
+        <label for="required-car-parking-space">Required Car Parking Space:</label>
+        <input type="number" id="required-car-parking-space" name="required_car_parking_space" required>
+
+        <label for="lead-time">Lead Time:</label>
+        <input type="number" id="lead-time" name="lead_time" required>
+
+        <label for="arrival-date">Arrival Date:</label>
+        <input type="date" id="arrival-date" name="arrival_date" min="2000-01-01" required>
+
+        <label for="avg-price-per-room">Average Price per Room:</label>
+        <input type="number" id="avg-price-per-room" name="avg_price_per_room" required>
+
+        <label for="no-of-special-requests">Number of Special Requests:</label>
+        <input type="number" id="no-of-special-requests" name="no_of_special_requests" required>
+
+        <label for="no-of-nights">Number of Nights:</label>
+        <input type="number" id="no-of-nights" name="no_of_nights" required>
+
+        <label for="room-type">Room Type:</label>
+        <select id="room-type" name="room_type_categorized">
+            <option value="0">Standard Room</option>
+            <option value="1">Deluxe Room</option>
+            <option value="2">Superior Room</option>
+        </select>
+
+        <label for="meal-plan">Type of Meal Plan:</label>
+        <select id="meal-plan" name="type_of_meal_plan_not_selected">
+            <option value="0">No Meal Plan Selected</option>
+            <option value="1">Bed and Breakfast</option>
+            <option value="2">Half Board</option>
+            <option value="3">Full Board</option>
+        </select>
+
+        <label for="market-segment">Market Segment:</label>
+        <select id="market-segment" name="market_segment_type">
+            <option value="0">Offline</option>
+            <option value="1">Online</option>
+        </select>
+
+        <button type="submit">Make Reservation</button>
+    </form>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

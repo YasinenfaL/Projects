@@ -119,9 +119,9 @@ async def predict(request: Request,
             X_test.append(int(data[key]))
 
         model = joblib.load("final_model.pkl")
-        # X_test listesi üzerinden tahmin yap
+      
         prediction = model.predict([X_test])
 
-        # Tahmin sonucunu kullanıcıya göster
+       
         from tkinter import messagebox
         messagebox.showinfo("Prediction Result", f"The predicted price is {prediction[0]:.2f} €.")

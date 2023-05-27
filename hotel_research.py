@@ -1,11 +1,7 @@
-# 1. Exploratory Data Analysis
-# 2. Data Preprocessing & Feature Engineering
-# 3. Base Models
-# 4. Automated Hyperparameter Optimization
-# 5. Stacking & Ensemble Learning
-# 6. Prediction for a New Observation
-# 7. Pipeline Main Function
-
+########################
+# Hotel Reservations Churn
+########################
+# Libraries
 from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
 from catboost import CatBoostClassifier
@@ -23,26 +19,15 @@ import matplotlib.pyplot as plt
 import matplotlib.pyplot as pyplot
 from datetime import datetime
 import os
-
-########################
-# Model Prep
-########################
-
+import xgboost as xgb
+from xgboost import XGBRegressor
+from lightgbm import LGBMClassifier
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, LabelEncoder
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay, \
     roc_auc_score, f1_score, precision_score, recall_score, accuracy_score, auc, roc_curve
-import shap
-from imblearn.over_sampling import SMOTE
 
-# Model
-import lazypredict
-from lazypredict.Supervised import LazyClassifier
-import xgboost as xgb
-from xgboost import XGBRegressor
-from lightgbm import LGBMClassifier
-from lazypredict.Supervised import LazyClassifier
 
 pd.set_option("display.max_column", None)
 pd.set_option("display.float_format", lambda x: "%3.f" % x)
@@ -53,10 +38,8 @@ from Help_kit import eda
 #################################
 # Load Dataframe
 #################################
-
 hotel_reserv = pd.read_csv("Projects/Hotel Reservations.csv")
 df = hotel_reserv.copy()
-
 df.drop("Booking_ID", axis=1, inplace=True)
 df["booking_status"] = df["booking_status"].apply(lambda x: 1 if x == "Not_Canceled" else 0)
 
@@ -64,25 +47,17 @@ df["booking_status"] = df["booking_status"].apply(lambda x: 1 if x == "Not_Cance
 # EDA
 ####################################
 eda.check_df(df["lead_time"])
-
 df["lead_time"].mean()
-
 df.info()
 df["room_type_reserved"].value_counts()
 df.groupby("room_type_reserved").agg({"total_price": "mean"})
-
 df["avg_price_per_room"].mean()
-
-#######
-# ?
 df.groupby("no_of_special_requests").agg({"total_price": "mean"})
-#######
-# df.groupby("type_of_meal_plan").agg({"avg_price_per_room": "mean"})
-# Ortalama oda fiyatı= 103.42 label encode işlemi
-# Meal Plan 1= Standart
-# Meal Plan 2= Ekleme yapmış olanlar
-# Not Selected= Herhangi bir şey seçmemiş
 
+# Average room price = 103.42 label coding operations
+# Meal Plan 1= Standard
+# Meal Plan 2= Those who have added
+# Not selected = Not selected anything
 
 cat_cols, num_cols, cat_but_car = eda.grab_col_names(df, cat_th=7, car_th=20)
 
@@ -102,13 +77,9 @@ for col in cat_cols:
 
 
 # Room_type_reserved?
-# Veri seti dengesiz
-# Yüzde 67'si 1 yani not_canceled(iptal etmemiş)
-# Yüzde 33'ü 0 yani canceled(iptal etmiş)
-#    BOOKING_STATUS  Ratio
-# 1           24390     67
-# 0           11885     33
-
+# The dataset is unbalanced
+# 67 percent 1 ie not_canceled(not cancelled)
+# 33 percent is 0 ie canceled
 
 def correlation_matrix(df, cols):
     fig = plt.gcf()
@@ -118,7 +89,6 @@ def correlation_matrix(df, cols):
     fig = sns.heatmap(df[cols].corr(), annot=True, linewidths=0.5, annot_kws={'size': 7}, linecolor='w', cmap='RdBu')
     plt.show(block=True)
 
-
 # correlation_matrix(df, num_cols)
 
 # Outlier Analysis
@@ -127,13 +97,10 @@ eda.check_outlier(df, num_cols)
 
 # Na
 df.isnull().sum()
-
-# Numerik değişkenlerin dağılımlarına ve boxplotlarına bak
-
 df.info()
 
 ######################################################
-# Feature
+# FEATURE ENGINEERING
 ######################################################
 
 cat_cols, num_cols, cat_but_car = eda.grab_col_names(df, cat_th=7, car_th=20)
@@ -172,8 +139,9 @@ df["room_type_categorized"] = df["room_type_reserved"].astype(str).replace("Room
     .replace("Room_Type 5", 4).replace("Room_Type 4", 5).replace("Room_Type 7", 6).replace("Room_Type 6", 7)
 
 df.columns = [col.upper() for col in df.columns]
+
 ##################################
-# Encode İşlemleri
+# ENCODİNG
 ##################################
 
 cat_cols, num_cols, cat_but_car = eda.grab_col_names(df, cat_th=7, car_th=20)
@@ -191,10 +159,7 @@ for col in binary_cols:
 
 cat_cols, num_cols, cat_but_car = eda.grab_col_names(df, cat_th=7, car_th=20)
 
-df.info()
-# Scale işlemi
-
-
+# Scale
 num_cols = [col for col in df.columns if df[col].dtype in ['int64', 'float64'] and col != 'BOOKING_STATUS']
 X_scaled = StandardScaler().fit_transform(df[num_cols])
 df[num_cols] = pd.DataFrame(X_scaled, columns=df[num_cols].columns)
@@ -232,8 +197,6 @@ cv_results['test_accuracy'].mean()
 cv_results['test_f1'].mean()
 # 0.9158128983364131
 cv_results['test_roc_auc'].mean()
-
-
 # 0.9458120590881972
 
 ##################################
@@ -294,7 +257,6 @@ lgbm_best_grid = GridSearchCV(lgbm_model, lgbm_params, cv=5, n_jobs=-1, verbose=
 ######################
 # Final Model
 #####################
-# Özellikleri belirleyin
 feature_importance = pd.DataFrame({'feature': X.columns, 'importance': lgbm_model.feature_importances_})
 low_importance_features = feature_importance.sort_values(by='importance', ascending=True)['feature'][:30]
 # En az etkili özellikleri kaldırın
@@ -308,15 +270,13 @@ lgbm_final = lgbm_model.set_params(colsample_bytree=0.7, max_depth=10, n_estimat
 # Model Validation
 #########################
 cv_results = cross_validate(lgbm_final, new_X, y, cv=5, scoring=["accuracy", "f1", "roc_auc"])
-
 cv_results['test_f1'].mean()
 # 0.9264540333020193
 cv_results['test_accuracy'].mean()
 # 0.8994073053066851
 cv_results['test_roc_auc'].mean()
-
-
 # 0.9545806530846125
+
 def plot_importance(model, features, num=len(X), save=False):
     feature_imp = pd.DataFrame({'Value': model.feature_importances_, 'Feature': features.columns})
     plt.figure(figsize=(20, 20))
